@@ -3,6 +3,8 @@ from bs4 import BeautifulSoup
 import requests
 import re
 
+# Necesario instalar 'pip install html5lib'  para que funcione la siguiente línea de código
+
 URL_BASE = 'https://mastalento.antamina.com/search'
 pedido_obtenido = requests.get(URL_BASE)
 html_obtenido = pedido_obtenido.text
@@ -61,7 +63,7 @@ for row in data_rows:
             texto_limpio = re.sub(r'\s+', ' ', contenido_elemento.get_text(strip=True).replace('\xa0', ' '))
             trabajo_html += f"\n\t\t<p>{texto_limpio}</p>"
 
-    trabajo_html += "\n    </div>"
+    trabajo_html += "\n\t</div>"
 
     # Agregar el HTML del trabajo al contenido total
     contenido_html += trabajo_html
