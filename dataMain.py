@@ -7,7 +7,7 @@ URL_BASE = 'https://mastalento.antamina.com/search'
 pedido_obtenido = requests.get(URL_BASE)
 html_obtenido = pedido_obtenido.text
 
-soup = BeautifulSoup(html_obtenido, "html.parser")
+soup = BeautifulSoup(html_obtenido, "html5lib")
 
 # Encontrar todos los elementos con la clase 'data-row'
 data_rows = soup.find_all('tr', class_='data-row')
@@ -34,7 +34,7 @@ for row in data_rows:
     pedido_enlace = requests.get(enlace)
     html_enlace = pedido_enlace.text
 
-    soupInfo = BeautifulSoup(html_enlace, "html.parser")
+    soupInfo = BeautifulSoup(html_enlace, "html5lib")
 
     # Encontrar el contenedor principal
     info = soupInfo.find('span', class_='jobdescription').find('div')
@@ -55,13 +55,13 @@ for row in data_rows:
         titulo_seccion = seccion.find('h2').get_text(strip=True)
         contenido_seccion = seccion.find_all('span', attrs={'style': 'font-size:14.0px'})
 
-        trabajo_html += f"<h3>{titulo_seccion}</h3>"
+        trabajo_html += f"\n\t<h3>{titulo_seccion}</h3>"
         for contenido_elemento in contenido_seccion:
             # Limpiar el texto y eliminar los espacios adicionales representados como &nbsp;
             texto_limpio = re.sub(r'\s+', ' ', contenido_elemento.get_text(strip=True).replace('\xa0', ' '))
-            trabajo_html += f"<p>{texto_limpio}</p>"
+            trabajo_html += f"\n\t\t<p>{texto_limpio}</p>"
 
-    trabajo_html += "</div>"
+    trabajo_html += "\n    </div>"
 
     # Agregar el HTML del trabajo al contenido total
     contenido_html += trabajo_html
