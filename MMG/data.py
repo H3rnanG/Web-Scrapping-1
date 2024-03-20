@@ -11,11 +11,33 @@ html_obtenido = pedido_obtenido.text
 
 soup = BeautifulSoup(html_obtenido, "html5lib")
 
-data_rows = soup.find_all('div', class_ = 'search-result')
+# Encontrar todos los elementos con la clase 'search-result'
+data_rows = soup.find('div',id='recent-jobs-content').find_all('div', class_ = 'search-result')
 
-# Verificar Divs
-for i in data_rows:
-    print(i)
-    print('\n\n\n')
+# Verificar datos
+# for div_trabajo in data_rows:
+#     print(div_trabajo)
+#     print('\n\n\n')
+
+# Crear una cadena de caracteres para almacenar todo el contenido HTML
+contenido_html = ""
+
+for row in data_rows:
+    # Extraer el titulo
+    titulo_elemento = row.find('h3').find('a',class_='job-link')
+    titulo = titulo_elemento.text.strip() if titulo_elemento else None
+
+    # Extraer Subtitulo
+    subtitulo = row.find('p',class_='result-sub-heading')
+
+    # Extraer Ubicacion y Tipo de Trabajo
+    ubicacion = subtitulo.find('span',class_="location").text.strip()
+    tipoTrabajo = subtitulo.find('span',class_='work-type tiempo-completo').text.strip()
+
+    # Extraer resumen
+    resumen = row.find('p',class_='result-description').text.strip()
+    
+    # Nota
+    nota = row.find('p',class_='result-note').text.strip()
 
 print("Archivo 'contenido.html' creado satisfactoriamente.")
