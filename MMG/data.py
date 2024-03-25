@@ -2,6 +2,7 @@ import bs4
 from bs4 import BeautifulSoup
 import requests
 import re
+import pandas as pd
 
 # Necesario instalar 'pip install html5lib'  para que funcione la siguiente línea de código
 
@@ -21,6 +22,7 @@ data_rows = soup.find('div',id='recent-jobs-content').find_all('div', class_ = '
 
 # Crear una cadena de caracteres para almacenar todo el contenido HTML
 contenido_html = ""
+trabajos_data = []
 
 for row in data_rows:
     # Extraer el titulo
@@ -39,5 +41,63 @@ for row in data_rows:
     
     # Nota
     nota = row.find('p',class_='result-note').text.strip()
+
+    # Extraer el enlace de mas informacion
+    enlace = URL_BASE[0:23] + titulo_elemento['href'] if titulo_elemento else None
+
+    #  Obtenemos el Html de la pagina del enlace
+    pedido_enlace = requests.get(enlace)
+    html_enlace = pedido_enlace.text
+
+    soupInfo = BeautifulSoup(html_enlace, "html5lib")
+
+    # Encuentra el contenido dentro del div 'job-content'
+    job_content_div = soupInfo.find('div', id='job-content')
+
+    # Excluye las imágenes dentro del contenido
+    for img in job_content_div.find_all('img'):
+        img.extract()
+
+    # Encuentra todos los elementos <p> y <ul> dentro del div 'job-content' después de excluir las imágenes
+    info = job_content_div.find_all(['p', 'ul'])
+
+    # Construir el HTML de cada trabajo
+    trabajo_html = f"""
+    <div class="trabajo">
+        <h2>{titulo}</h2>
+        <p>Enlace: <a href="{enlace}">{enlace}</a></p>
+        <p>Resumen: {resumen}</p>
+        <p>País: {nota}</p>
+    """
+
+    descripcion_html = str(info)
+    trabajo_html += str(info)
+
+    trabajo_html += "</div>"
+
+    contenido_html += trabajo_html
+    contenido_html += '\n--------------------------------------------------------------------------------------\n'
+
+    # Agregar los datos del trabajo a la lista
+    trabajos_data.append({
+        'title': titulo,
+        'description': descripcion_html,
+        'url': enlace,
+        'category': 'null',
+        'department': 'null',
+        'province': 'null',
+        'district': 'null',
+        'company': 'null'
+    })
+
+# Crear un DataFrame de Pandas con los datos de los trabajos
+df = pd.DataFrame(trabajos_data)
+
+# Guardar el DataFrame en un archivo CSV
+df.to_csv('trabajos_mmg.csv', index=False)
+        
+# Escribir el contenido HTML en un archivo HTML
+with open("contenido.html", "w", encoding="utf-8") as file:
+    file.write(contenido_html)
 
 print("Archivo 'contenido.html' creado satisfactoriamente.")
