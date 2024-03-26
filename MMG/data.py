@@ -13,12 +13,7 @@ html_obtenido = pedido_obtenido.text
 soup = BeautifulSoup(html_obtenido, "html5lib")
 
 # Encontrar todos los elementos con la clase 'search-result'
-data_rows = soup.find('div',id='recent-jobs-content').find_all('div', class_ = 'search-result')
-
-# Verificar datos
-# for div_trabajo in data_rows:
-#     print(div_trabajo)
-#     print('\n\n\n')
+data_rows = soup.find('div', id='recent-jobs-content').find_all('div', class_='search-result')
 
 # Crear una cadena de caracteres para almacenar todo el contenido HTML
 contenido_html = ""
@@ -26,21 +21,21 @@ trabajos_data = []
 
 for row in data_rows:
     # Extraer el titulo
-    titulo_elemento = row.find('h3').find('a',class_='job-link')
+    titulo_elemento = row.find('h3').find('a', class_='job-link')
     titulo = titulo_elemento.text.strip() if titulo_elemento else None
 
     # Extraer Subtitulo
-    subtitulo = row.find('p',class_='result-sub-heading')
+    subtitulo = row.find('p', class_='result-sub-heading')
 
     # Extraer Ubicacion y Tipo de Trabajo
-    ubicacion = subtitulo.find('span',class_="location").text.strip()
-    tipoTrabajo = subtitulo.find('span',class_='work-type tiempo-completo').text.strip()
+    ubicacion = subtitulo.find('span', class_="location").text.strip()
+    tipoTrabajo = subtitulo.find('span', class_='work-type tiempo-completo').text.strip()
 
     # Extraer resumen
-    resumen = row.find('p',class_='result-description').text.strip()
-    
+    resumen = row.find('p', class_='result-description').text.strip()
+
     # Nota
-    nota = row.find('p',class_='result-note').text.strip()
+    nota = row.find('p', class_='result-note').text.strip()
 
     # Extraer el enlace de mas informacion
     enlace = URL_BASE[0:23] + titulo_elemento['href'] if titulo_elemento else None
@@ -70,8 +65,9 @@ for row in data_rows:
         <p>País: {nota}</p>
     """
 
-    descripcion_html = str(info)
-    trabajo_html += str(info)
+    # Concatenar el HTML de cada trabajo sin las comas innecesarias y corchetes
+    descripcion_html = ''.join([str(tag) for tag in info if 'ProducimosCobreProducimosTalento' not in str(tag) and '<a class="apply-link button"' not in str(tag)])
+    trabajo_html += descripcion_html
 
     trabajo_html += "</div>"
 
@@ -94,10 +90,10 @@ for row in data_rows:
 df = pd.DataFrame(trabajos_data)
 
 # Guardar el DataFrame en un archivo CSV
-df.to_csv('trabajos_mmg.csv', index=False)
-        
-# Escribir el contenido HTML en un archivo HTML
-with open("contenido.html", "w", encoding="utf-8") as file:
-    file.write(contenido_html)
+df.to_csv('MMG/trabajos_mmg.csv', index=False)
 
-print("Archivo 'contenido.html' creado satisfactoriamente.")
+# Escribir el contenido HTML en un archivo HTML
+# with open("MMG/contenido.html", "w", encoding="utf-8") as file:
+#     file.write(contenido_html)
+
+print("Archivo 'trabajos_mmg.html' creado satisfactoriamente.")
