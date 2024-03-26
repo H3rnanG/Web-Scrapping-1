@@ -32,9 +32,9 @@ def CosapiScrap():
             'description': descripcion_html,
             'url': enlace,
             'category': '85',
-            'department': 'Lima',
+            'department': 'Ica',
             'province': '',
-            'district': 'San Isidro',
+            'district': '',
             'company': 'Cosapi'
         })
 
