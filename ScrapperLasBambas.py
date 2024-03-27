@@ -62,6 +62,6 @@ def LasBambasScrap():
     df = pd.DataFrame(trabajos_data)
 
     # Guardar el DataFrame en un archivo CSV
-    df.to_csv('Las Bambas/trabajos_mmg.csv', index=False)
+    df.to_csv('CSV/trabajos_mmg.csv', index=False)
 
     print("Archivo 'trabajos_mmg.csv' creado satisfactoriamente.")

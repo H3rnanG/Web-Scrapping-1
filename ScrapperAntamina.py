@@ -64,6 +64,6 @@ def AntaminaScrap():
     df = pd.DataFrame(trabajos_data)
 
     # Guardar el DataFrame en un archivo CSV
-    df.to_csv('trabajos_antamina.csv', index=False)
+    df.to_csv('CSV/trabajos_antamina.csv', index=False)
 
     print("Archivo 'trabajos_antamina.csv' creado satisfactoriamente.")
