@@ -1,32 +1,34 @@
 import pandas as pd
 from funciones import getContenedor
+from funciones import getTituloEnlace
 
 def YanacochaScrap():
-    # Obtener contenedor
+    # Url inicial
     URL = 'https://jobs.newmont.com'
     URL_BASE = URL + '/go/Business-Professionals/7986400/'
 
+    # Obtener elementos de la paginacion
     contenedorPaginacion = getContenedor(URL_BASE,'ul',clase='pagination')
+    # Los corchetes son para ignorar los li  que son enlaces para acceder a la primera y ultima pagina 
     paginacion = contenedorPaginacion.findAll('li')[1:-1]
 
     # Crear una lista para el dataframe
     trabajos_data = []
 
     for pagina in paginacion:
+        # Obtener enlace de la pagina
         enlacePaginacion = URL + pagina.find('a')['href']
 
+        # Obtener tabla y hacer un array de todas las filas
         contenedor = getContenedor(enlacePaginacion,'tbody')
         data_rows = contenedor.find_all('tr', class_='data-row')
 
+        # Iterar las filas para obtener los daots
         for row in data_rows:
-            # Titulo
-            titulo_elemento = row.find('a',class_='jobTitle-link')
-            titulo = titulo_elemento.text.strip() if titulo_elemento else None
+            claseTitulo = 'jobTitle-link'
+            titulo, enlace = getTituloEnlace(row,URL,claseTitulo)
 
-            # Enlace
-            enlace = URL + titulo_elemento['href'] if titulo_elemento else None
-
-            descripcion_html = getContenedor(url=enlace,etiqueta='span',clase='jobdescription')
+            descripcion_html = getContenedor(enlace,'span','jobdescription')
             
             # Agregar los datos del trabajo a la lista
             trabajos_data.append({
@@ -40,7 +42,7 @@ def YanacochaScrap():
                 'company': 'Minera Yanacocha'
             })
 
-        # Eliminar este Brake para que se obtenga todos los trabajos de todas las páginas
+        #Eliminar el break para obtener todos los trabajos de todas las paginas
         break
 
     # Crear un DataFrame de 'trabajos_data' y crear un csv

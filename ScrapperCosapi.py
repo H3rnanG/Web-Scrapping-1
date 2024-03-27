@@ -1,9 +1,7 @@
 import bs4
 from bs4 import BeautifulSoup 
-import requests
-import re
 import pandas as pd
-from funciones import getContenedor
+from funciones import getContenedor,getTituloEnlace
 
 def CosapiScrap():
     # Obtener contenedor
@@ -17,12 +15,7 @@ def CosapiScrap():
     trabajos_data = []
 
     for row in data_rows:
-        # Titulo
-        titulo_elemento = row.find('a',class_='jobTitle-link')
-        titulo = titulo_elemento.text.strip() if titulo_elemento else None
-
-        # Enlace
-        enlace = URL + titulo_elemento['href'] if titulo_elemento else None
+        titulo, enlace = getTituloEnlace(row, URL, 'jobTitle-link')
 
         descripcion_html = getContenedor(enlace,'span','jobdescription').find('div')
 

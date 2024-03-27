@@ -15,19 +15,29 @@ def getContenedor(url, etiqueta, clase=None, ide=None):
         contenedor: elemento html filtrado por clase y id
     """
 
-    URL_BASE = url
-    pedido_obtenido = requests.get(URL_BASE)
+    pedido_obtenido = requests.get(url)
     html_obtenido = pedido_obtenido.text
 
     soup = BeautifulSoup(html_obtenido, "html5lib")
     
-    if clase is not None and ide is not None:
-        contenedor = soup.find(etiqueta, class_=clase, id=ide)
-    elif clase is not None:
-        contenedor = soup.find(etiqueta, class_=clase)
-    elif ide is not None:
-        contenedor = soup.find(etiqueta, id=ide)
-    else:
-        contenedor = soup.find(etiqueta)
+    contenedor = soup.find(etiqueta, class_=clase, id=ide)
 
     return contenedor
+
+def getTituloEnlace(row,url,claseTitulo=None,idTitulo=None):
+    """
+    Esta funcion retorna el titulo y el enlace de un elemento html
+
+    Args:
+        row (elemento): elemento de un array
+        url (string): url
+        claseTitulo (string o array, opcional): clase de un elemento html
+        idTitulo (string o array, opcional): id de un elemento html
+    """
+    titulo_elemento = row.find('a', class_=claseTitulo, id=idTitulo)
+
+    titulo = titulo_elemento.text.strip() if titulo_elemento else None
+
+    enlace = url + titulo_elemento['href'] if titulo_elemento else None
+
+    return titulo,enlace

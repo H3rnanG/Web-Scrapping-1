@@ -3,38 +3,25 @@ from bs4 import BeautifulSoup
 import requests
 import re
 import pandas as pd
+from funciones import getContenedor,getTituloEnlace
 
 def AntaminaScrap():
     # Necesario instalar 'pip install html5lib'  para que funcione la siguiente línea de código
 
-    URL_BASE = 'https://mastalento.antamina.com/search'
-    pedido_obtenido = requests.get(URL_BASE)
-    html_obtenido = pedido_obtenido.text
+    URL = 'https://mastalento.antamina.com'
+    URL_BASE = URL + '/search'
 
-    soup = BeautifulSoup(html_obtenido, "html5lib")
-
-    # Encontrar todos los elementos con la clase 'data-row'
-    data_rows = soup.find_all('tr', class_='data-row')
+    contenedor = getContenedor(URL_BASE,'tbody')
+    data_rows = contenedor.find_all('tr', class_='data-row')
 
     # Crear una lista para almacenar los datos de cada trabajo
     trabajos_data = []
 
     for row in data_rows:
-        # Extraer el título
-        titulo_elemento = row.find('span', class_='jobTitle').find('a', class_='jobTitle-link')
-        titulo = titulo_elemento.text.strip() if titulo_elemento else None
-        
-        # Extraer el enlace de mas informacion
-        enlace = URL_BASE[0:-7] + titulo_elemento['href'] if titulo_elemento else None
-
-        #  Obtenemos el Html de la pagina del enlace
-        pedido_enlace = requests.get(enlace)
-        html_enlace = pedido_enlace.text
-
-        soupInfo = BeautifulSoup(html_enlace, "html5lib")
+        titulo, enlace = getTituloEnlace(row,URL,'jobTitle-link')
 
         # Encontrar el contenedor principal
-        info = soupInfo.find('span', class_='jobdescription').find('div')
+        info = getContenedor(enlace,'span','jobdescription').find('div')
 
         # Construir la descripción HTML del trabajo
         descripcion_html = ""
@@ -67,3 +54,5 @@ def AntaminaScrap():
     df.to_csv('CSV/trabajos_antamina.csv', index=False)
 
     print("Archivo 'trabajos_antamina.csv' creado satisfactoriamente.")
+
+AntaminaScrap()
